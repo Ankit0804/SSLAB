@@ -113,8 +113,8 @@ int parse_src (char *srcfilename)
 		{
 			printf("%s\t",line[0]);
 			fprintf(fsym,"%s\t%x\n",line[0],loc);
-			sprintf(temp,"%x",loc);
-			insertsym(line[0],temp);
+			//sprintf(temp,"%x",loc);
+			//insertsym(line[0],temp);
 		}
 		//write to file		
 		printf("%s\t%s\n",line[1],line[2]);
