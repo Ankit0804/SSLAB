@@ -29,7 +29,7 @@ typedef struct hash_t
   node **data;
 } hash_t;
 
-hash_t *table,*symtab;
+hash_t *table,*symtable;
 
 /**
  * Returns opcode if mnemonic is in hashmap else NULL.
@@ -56,16 +56,16 @@ const char* checkop(const char* code)
     return NULL;
 }
 
-const char* checkop(const char* code)
+const char* checksym(const char* code)
 {
     char tempw[LENGTH+1];
     strcpy(tempw,code);
     for(int i=0;tempw[i]!='\0';i++) tempw[i] = toupper(tempw[i]);
     unsigned int hashval = hash(tempw);
-    if(symtab->data[hashval]==NULL) return false;
+    if(symtable->data[hashval]==NULL) return false;
     else
     {
-        node *temp = symtab->data[hashval];
+        node *temp = symtable->data[hashval];
         while(temp!=NULL)
         {
             if(strcmp(tempw,temp->code)==0) return temp->opcode;
@@ -103,11 +103,12 @@ node *insert(node *pointer, char * mnemonic, char * opcode)
 
 void insertsym(char * symbol, char * location)
 {
+	unsigned long hashval;
    	//Get hashvalue
 	hashval = hash(symbol);
 	//insert code at hashval in table
-	symtab->data[hashval] = insert(symtab->data[hashval],symbol,location);
-	symtab->size++;
+	symtable->data[hashval] = insert(symtable->data[hashval],symbol,location);
+	symtable->size++;
 }
 
 bool loadsym(const char* symtabfile)
@@ -115,8 +116,8 @@ bool loadsym(const char* symtabfile)
    unsigned long hashval;
    char symbol[LENGTH+1],loc[OPLENGTH+1];
   
-   symtab = malloc(sizeof(hash_t));
-   symtab->size=0;
+   symtable = malloc(sizeof(hash_t));
+   symtable->size=0;
    FILE* fp = fopen(symtabfile, "r");
    if (fp == NULL)
     {
@@ -127,11 +128,11 @@ bool loadsym(const char* symtabfile)
    
    // Allocate memory for the actual data
 
-   symtab->data = malloc ( HASHMAX * sizeof(node *));
+   symtable->data = malloc ( HASHMAX * sizeof(node *));
 
    for(int i =0;i<HASHMAX;i++) {
 	
-	 symtab->data[i] = NULL;
+	 symtable->data[i] = NULL;
    }
 
    while(fscanf(fp,"%s",symbol)!=EOF)
@@ -160,9 +161,9 @@ bool load(const char* optabfile)
    unsigned long hashval;
    char mncode[LENGTH+1],opcode[OPLENGTH+1];
    table = malloc(sizeof(hash_t));
-   symtab = malloc(sizeof(hash_t));
+   symtable = malloc(sizeof(hash_t));
    table->size=0;
-   symtab->size=0;
+   symtable->size=0;
    FILE* fp = fopen(optabfile, "r");
    if (fp == NULL)
     {
@@ -173,11 +174,11 @@ bool load(const char* optabfile)
    
    // Allocate memory for the actual data
    table->data = malloc ( HASHMAX * sizeof(node *));
-   symtab->data = malloc ( HASHMAX * sizeof(node *));
+   symtable->data = malloc ( HASHMAX * sizeof(node *));
 
    for(int i =0;i<HASHMAX;i++) {
 	 table->data[i] = NULL;
-	 symtab->data[i] = NULL;
+	 symtable->data[i] = NULL;
    }
 
    while(fscanf(fp,"%s",mncode)!=EOF)

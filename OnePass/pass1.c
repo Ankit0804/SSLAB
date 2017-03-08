@@ -95,7 +95,7 @@ int parse_src (char *srcfilename)
 			continue;
 		}
 		else if (strcmp(line[1],"END")==0){ }
-		else if (check(line[1]) == NULL)
+		else if (checkop(line[1]) == NULL)
 		{
 			printf("\nERROR in line %d\n",lineno);
 			break;
@@ -121,7 +121,7 @@ int parse_src (char *srcfilename)
 		fprintf(floc,"%s\t%s\n",line[1],line[2]);
 		
 		//handle location counter update
-		if((strlen(line[0])!=0) && (strcmp(check(line[1]),"*")==0))
+		if((strlen(line[0])!=0) && (strcmp(checkop(line[1]),"*")==0))
 		{
 			
 			//Handle BYTE
@@ -187,7 +187,8 @@ int main(int argc, char* argv[])
 	printf("Parsing source file: %s\n",argv[2]);
 
 	if (parse_src(argv[2])) return 1;
-
+	loadsym("SYMTAB.txt");
+	
 	printf("Wrote SYMTAB.txt and LOCCTR.txt\n");
 	unload();
 	return 0;	
