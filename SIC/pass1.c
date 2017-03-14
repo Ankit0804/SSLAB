@@ -90,11 +90,13 @@ int parse_src (char *srcfilename)
 		if (strcmp(line[1],"START") == 0)
 		{
 			loc = strtol(line[2], NULL, 16);
-			printf("START\t%x\n",loc);
-			fprintf(floc,"START\t%x\n",loc);
+			printf("%s\tSTART\t%x\n",line[0],loc);
+			fprintf(floc,"%s\tSTART\t%x\n",line[0],loc);
 			continue;
 		}
-		else if (strcmp(line[1],"END")==0){ }
+		else if (strcmp(line[1],"END")==0){ 
+			fprintf(fsym,"%s\t%x\n",line[1],loc);
+		}
 		else if (checkop(line[1]) == NULL)
 		{
 			printf("\nERROR in line %d\n",lineno);
