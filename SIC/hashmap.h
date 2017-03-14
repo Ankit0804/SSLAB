@@ -28,7 +28,7 @@ const char * checksym(const char* sym);
  * Loads hashmap into memory.  Returns true if successful else false.
  */
 bool load(const char* optabfile);
-bool loadsym(const char* symtabfile)
+bool loadsym(const char* symtabfile);
 void insertsym(char * symbol, char * location);
 /**
  * Returns number of codes in hashmap if loaded else 0 if not yet loaded.

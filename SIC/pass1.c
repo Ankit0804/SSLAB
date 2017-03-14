@@ -90,12 +90,14 @@ int parse_src (char *srcfilename)
 		if (strcmp(line[1],"START") == 0)
 		{
 			loc = strtol(line[2], NULL, 16);
-			printf("START\t%x\n",loc);
-			fprintf(floc,"START\t%x\n",loc);
+			printf("%s\tSTART\t%x\n",line[0],loc);
+			fprintf(floc,"%s\tSTART\t%x\n",line[0],loc);
 			continue;
 		}
-		else if (strcmp(line[1],"END")==0){ }
-		else if (check(line[1]) == NULL)
+		else if (strcmp(line[1],"END")==0){ 
+			fprintf(fsym,"%s\t%x\n",line[1],loc);
+		}
+		else if (checkop(line[1]) == NULL)
 		{
 			printf("\nERROR in line %d\n",lineno);
 			break;
@@ -113,15 +115,15 @@ int parse_src (char *srcfilename)
 		{
 			printf("%s\t",line[0]);
 			fprintf(fsym,"%s\t%x\n",line[0],loc);
-			sprintf(temp,"%x",loc);
-			insertsym(line[0],temp);
+			//sprintf(temp,"%x",loc);
+			//insertsym(line[0],temp);
 		}
 		//write to file		
 		printf("%s\t%s\n",line[1],line[2]);
 		fprintf(floc,"%s\t%s\n",line[1],line[2]);
 		
 		//handle location counter update
-		if((strlen(line[0])!=0) && (strcmp(check(line[1]),"*")==0))
+		if((strlen(line[0])!=0) && (strcmp(checkop(line[1]),"*")==0))
 		{
 			
 			//Handle BYTE
@@ -187,7 +189,8 @@ int main(int argc, char* argv[])
 	printf("Parsing source file: %s\n",argv[2]);
 
 	if (parse_src(argv[2])) return 1;
-
+	loadsym("SYMTAB.txt");
+	
 	printf("Wrote SYMTAB.txt and LOCCTR.txt\n");
 	unload();
 	return 0;	
