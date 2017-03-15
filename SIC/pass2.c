@@ -1,6 +1,6 @@
 /**
- * pass1.c	
- * Description: Pass 1 of a two pass assembler
+ * pass2.c	
+ * Description: Pass 2 of a two pass assembler
  * Author: Arjun Rao (1MS14IS018)
  * Course: System Software Laboratory
  */
