@@ -12,7 +12,7 @@ clean:
 	rm -rf build/
 
 pass1: pass1.c hashmap.c
-	 mkdir -p build;	gcc -std=gnu99  pass1.c hashmap.c -o build/pass1
+	 mkdir -p build;	gcc-6 -std=gnu99 -ggdb  pass1.c hashmap.c -o build/pass1
 
 pass2: pass2.c hashmap.c
-	 mkdir -p build;	gcc -std=gnu99  pass2.c hashmap.c -o build/pass2
+	 mkdir -p build;	gcc-6 -std=gnu99 -ggdb pass2.c hashmap.c -o build/pass2

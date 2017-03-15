@@ -18,8 +18,8 @@
  
 typedef struct node 
 {
-  char code[LENGTH+1]; //stores mnemonic
-  char opcode[OPLENGTH+1]; //stores opcode
+  char code[255+1]; //stores mnemonic
+  char opcode[255+1]; //stores opcode
   struct node* link;
 } node;
 
@@ -86,7 +86,7 @@ node *insert(node *pointer, char * mnemonic, char * opcode)
     {
         pointer = malloc(sizeof(node));
         strcpy(pointer->code,mnemonic);
-	strcpy(pointer->opcode,opcode);
+    	strcpy(pointer->opcode,opcode);
         pointer->link = NULL;
     }
     else //insert in the first position;    
@@ -111,11 +111,18 @@ void insertsym(char * symbol, char * location)
 	symtable->size++;
 }
 
+char* strdup(const char* s)
+{
+    char* p = malloc(strlen(s)+1);
+    if (p) strcpy(p, s);
+    return p;
+}
+
 bool loadsym(const char* symtabfile)
 {
    unsigned long hashval;
-   char symbol[LENGTH+1],loc[OPLENGTH+1];
-  
+   char symbol[255+1],loc[LENGTH+2];
+   char *token,*buff, line[255];
    symtable = malloc(sizeof(hash_t));
    symtable->size=0;
    FILE* fp = fopen(symtabfile, "r");
@@ -135,18 +142,26 @@ bool loadsym(const char* symtabfile)
 	 symtable->data[i] = NULL;
    }
 
-   while(fscanf(fp,"%s",symbol)!=EOF)
+   while(fgets(line, 255, fp) != NULL)
    {
+       buff = strdup (line);
         //read a mnemonic and opcode, now insert into hashtable;
-	if(fscanf(fp,"%s\n",loc)!=EOF)
-	{
-		//Get hashvalue
-		hashval = hash(symbol);
-		//insert code at hashval in table
-		symtable->data[hashval] = insert(symtable->data[hashval],symbol,loc);
-		symtable->size++;
-	}
+        if((token = strsep(&buff, "\t"))!=NULL)
+        {
+            strcpy(symbol,token);
+            if((token = strsep(&buff, "\t"))!=NULL)
+            {    
+                strcpy(loc,token);
+                //Get hashvalue
+                hashval = hash(symbol);
+                //insert code at hashval in table
+                symtable->data[hashval] = insert(symtable->data[hashval],symbol,loc);
+                symtable->size++;
+            }
+        }
    }
+
+   
    fclose(fp);
       
    return true;

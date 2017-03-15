@@ -13,12 +13,6 @@
 
 #include "hashmap.h"
 
-char* strdup(const char* s)
-{
-    char* p = malloc(strlen(s)+1);
-    if (p) strcpy(p, s);
-    return p;
-}
 
 
 int parse_optab (char *fname)
@@ -35,7 +29,7 @@ int parse_optab (char *fname)
 
 void initTextRecord(char *trec, unsigned int loc)
 {
-	char tempstr[6];
+	char tempstr[10];
 	trec[0] = 'T';
 	trec[1] = '\0';
 	sprintf(tempstr,"%06xYY",loc);
@@ -44,7 +38,7 @@ void initTextRecord(char *trec, unsigned int loc)
 
 void writeTextRecord(char *trec,FILE* fobj)
 {
-	char tempstr[6];
+	char tempstr[10];
 	unsigned int tempLen = 0;
 	for(int i=9;trec[i]!='\0';i++)
 	{
@@ -64,8 +58,8 @@ void writeTextRecord(char *trec,FILE* fobj)
 int pass2 (char *intermfile)
 {
 	FILE *fsrc,*fobj;
-	char buff[255],*token,temp[8];
-	char hrec[19],trec[69],erec[7];
+	char buff[257],*token,temp[8];
+	char hrec[20],trec[70],erec[8];
 	//declare location counter
 	unsigned int loc = 0,hexno = 0;
 	unsigned int lineno = 0;
@@ -92,7 +86,7 @@ int pass2 (char *intermfile)
 	{
 		lineno++;
 		//read a line
-		char *str,cbuff[255],line[3][255],tempstr[6],finst[6],instruction[6];
+		char *str,cbuff[257],line[3][257],tempstr[7],finst[7],instruction[7];
 		strcpy(cbuff,buff);
 		str = strdup (cbuff);
 		//handle comment line

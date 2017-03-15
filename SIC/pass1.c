@@ -13,12 +13,7 @@
 
 #include "hashmap.h"
 
-char* strdup(const char* s)
-{
-    char* p = malloc(strlen(s)+1);
-    if (p) strcpy(p, s);
-    return p;
-}
+
 
 
 int parse_optab (char *fname)
@@ -189,7 +184,6 @@ int main(int argc, char* argv[])
 	printf("Parsing source file: %s\n",argv[2]);
 
 	if (parse_src(argv[2])) return 1;
-	loadsym("SYMTAB.txt");
 	
 	printf("Wrote SYMTAB.txt and LOCCTR.txt\n");
 	unload();
