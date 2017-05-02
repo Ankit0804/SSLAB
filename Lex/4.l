@@ -8,6 +8,8 @@
 
 [_a-zA-Z][_a-zA-Z0-9]* {num_identifiers++;printf("Indentfier: %s\n",yytext);}
 [.]* {;}
+\n {;}
+
 %%
 
 int main()
