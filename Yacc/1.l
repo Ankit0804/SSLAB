@@ -1,16 +1,12 @@
-%{//1. Develop a YACC program to recognize a valid arithmetic
-//expression that uses operator +, -, *, /
-%}
-
 %{
-#include "y.tab.c"
+    #include "y.tab.h"
 %}
 
 %%
-[0-9]+			return NUM;
-[a-zA-Z_][a-zA-Z0-9_]*	return ID;
-\n			return NL;
-.			return *yytext;
+[-]?[0-9]+                  {return NUM;}
+[-]?[a-zA-Z_][_a-zA-Z0-9]*  {return ID;}
+\n			            {return NL;}
+.			            {return yytext[0];}
 %%
 
 int yywrap()

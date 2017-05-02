@@ -1,16 +1,12 @@
-%{//3. Develop a YACC program to evaluate an arithmetic expression
-//involving operators +, -, * and /.
-%}
-
 %{
-#include "y.tab.c"
+#include "y.tab.h"
 extern int yylval;
 %}
 
 %%
-[0-9]+			{yylval = atoi(yytext); return NUM;}
+[-]?[0-9]+		{yylval = atoi(yytext); return NUM;}
 \n			return NL;
-.			return *yytext;
+.			return yytext[0];
 %%
 
 int yywrap()

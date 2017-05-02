@@ -1,11 +1,5 @@
 %{
-
-/*1. Develop a YACC program to recognize a valid arithmetic
-expression that uses operator +, -, *, /
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
+#include<stdio.h>
 int yylex();
 int yyerror(char *s);
 %}
@@ -13,24 +7,24 @@ int yyerror(char *s);
 %token NUM ID NL
 %left '+' '-'
 %left '*' '/'
-%%
 
-S :	E NL {printf("Valid expression!\n"); exit(0);};
+%%
+S :	E NL {printf("Valid expression!\n"); return 0;};
+    | ID "=" E NL {printf("Valid expression!\n"); return 0;};
 E :	  E '+' E
 	| E '-' E
-    | '-' E
 	| E '*' E
 	| E '/' E
 	| '(' E ')'
 	| ID
 	| NUM
-	;
+    ;
 %%
 
 int yyerror(char *s)
 {
 	printf("Invalid expression!\n");
-	exit(0);
+	return 1;
 }
 
 int main()
@@ -38,4 +32,4 @@ int main()
 	printf("Enter expression: ");
 	yyparse();
 	return 0;
-}	
+}
