@@ -11,13 +11,11 @@ int yyerror(char *s);
 %token A B NL
 %%
 
-S : C D NL {printf("Valid string!\n"); exit(0);}; 
-C : A C
-  | A |
-  ;
-D : B D
-  | B
-  |
+S : C D NL {printf("Valid string!\n"); exit(0);}
+
+C : A C |
+  
+D : B D |
   ;
 %%
 
