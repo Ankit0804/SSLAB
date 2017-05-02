@@ -6,18 +6,23 @@
     int num_operators = 0,num_identifiers = 0;
     char stack[100];
     int top=-1;
-
+    int opflag=0;
     void validate();
 %}
 
+%x operand_active
+
 %%
 
-[_a-zA-Z][_a-zA-Z0-9]* {num_identifiers++;printf("Indentfier: %s\n",yytext);}
-[0-9]+ {num_identifiers++;printf("Constant: %s\n",yytext);}
-[+] {flags[PLUS]++;}
-[-] {flags[MINUS]++;}
-[/] {flags[DIV]++;}
-[*] {flags[MUL]++;}
+[-]?[_a-zA-Z][_a-zA-Z0-9]* {num_identifiers++;printf("Indentfier: %s\n",yytext);}
+<operand_active>[-]?[_a-zA-Z][_a-zA-Z0-9]* {num_identifiers++;printf("Indentfier: %s\n",yytext);opflag=0; BEGIN(0);}
+[-]?[0-9]+ {num_identifiers++;printf("Constant: %s\n",yytext);}
+<operand_active>[-]?[0-9]+ {num_identifiers++;printf("Constant: %s\n",yytext); opflag=0;BEGIN(0);}
+[+] {flags[PLUS]++; opflag=1;BEGIN(operand_active);}
+[-] {flags[MINUS]++; opflag=1;BEGIN(operand_active);}
+[/] {flags[DIV]++; opflag=1;BEGIN(operand_active);}
+[*] {flags[MUL]++; opflag=1;BEGIN(operand_active);}
+[ \t] {;}
 [(] {stack[++top]='(';}
 [)] {
         if(stack[top] == '(')
@@ -26,6 +31,7 @@
         }
     }
 [;] {validate();}
+<operand_active>[;] {validate(); BEGIN(0);}
 
 %%
 
@@ -44,7 +50,7 @@ int yywrap()
 void validate()
 {
     num_operators = flags[PLUS]+flags[MINUS]+flags[DIV]+flags[MUL];   
-    if(num_identifiers==num_operators+1 && top)
+    if(num_identifiers==num_operators+1 && top && !opflag)
     {
         printf("\nExpression is valid and contains the following operators: ");
         if(flags[PLUS]) printf("+\t");
