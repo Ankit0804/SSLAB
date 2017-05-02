@@ -10,14 +10,16 @@
     void validate();
 %}
 
-%x operand_active
+%s operand_active
 
 %%
 
-[-]?[_a-zA-Z][_a-zA-Z0-9]* {num_identifiers++;printf("Indentfier: %s\n",yytext);}
+
 <operand_active>[-]?[_a-zA-Z][_a-zA-Z0-9]* {num_identifiers++;printf("Indentfier: %s\n",yytext);opflag=0; BEGIN(0);}
-[-]?[0-9]+ {num_identifiers++;printf("Constant: %s\n",yytext);}
+[_a-zA-Z][_a-zA-Z0-9]* {num_identifiers++;printf("Indentfier: %s\n",yytext);}
 <operand_active>[-]?[0-9]+ {num_identifiers++;printf("Constant: %s\n",yytext); opflag=0;BEGIN(0);}
+[0-9]+ {num_identifiers++;printf("Constant: %s\n",yytext);}
+
 [+] {flags[PLUS]++; opflag=1;BEGIN(operand_active);}
 [-] {flags[MINUS]++; opflag=1;BEGIN(operand_active);}
 [/] {flags[DIV]++; opflag=1;BEGIN(operand_active);}
@@ -30,8 +32,9 @@
             top--;
         }
     }
-[;] {validate();}
 <operand_active>[;] {validate(); BEGIN(0);}
+[;] {validate();}
+
 
 %%
 
