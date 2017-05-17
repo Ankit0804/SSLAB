@@ -38,7 +38,7 @@ void tokenize(string line,string &l,string &m,string &o)
     stringstream tokens(line);
     getline(tokens,l,'\t');
     getline(tokens,m,'\t');
-    getline(tokens,o,'\t');
+    getline(tokens,o,'\n');
 }
 void pass1(string ifile,string ofile)
 {
@@ -89,7 +89,7 @@ void pass1(string ifile,string ofile)
             temp <<setfill('0')<<setw(4)<<uppercase<<hex<<loc;
             symtab[label] = temp.str();
         }
-        outfile<<setfill('0')<<setw(4)<<uppercase<<hex<<loc<<"\t"<<line<<endl;
+        outfile<<setfill('0')<<setw(4)<<uppercase<<hex<<loc<<"\t"<<line<<"\n";
         //handle location counter updates
         if((iter = optab.find(mnemonic))!=optab.end())
         {         

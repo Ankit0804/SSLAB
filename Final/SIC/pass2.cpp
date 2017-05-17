@@ -34,12 +34,11 @@ void tokenize(string line,string &lo,string &la,string &m,string &o)
     getline(tokens,lo,'\t');
     getline(tokens,la,'\t');
     getline(tokens,m,'\t');
-    getline(tokens,o,'\t');
+    getline(tokens,o,'\n');
 }
 
-string generate(string line);
+string generate(string loc,string lab,string mne, string op);
 void pass2a(string ifile,string ofile);
-void pass2b(string ifile,string ofile){}
 
 int main()
 {
@@ -47,16 +46,18 @@ int main()
     pass2a("outpass1.txt","outpass2a.txt");
 }
 
+int first = -1;
+
 void pass2a(string ifile,string ofile)
 {
     //to generate object codes, open in/out files, store lineno, tokens
     fstream infile(ifile,ios::in);
-    int lineno=0,loc = 0;
-    fstream outfile(ofile,ios::out);
-    string line,objcode;
-    
+    int lineno=0,loc = 0,len=0,flag=0;
+    fstream outfile(ofile,ios::out),objfile("outpass2b.txt",ios::out);
+    string line,objcode,locctr,lab,mne,op;
+    stringstream temp,textrecord("");
     while(getline(infile,line))
-    {
+    {        
         lineno++;
         //if comment, skip
         if(line[0] == '.')
@@ -64,32 +65,90 @@ void pass2a(string ifile,string ofile)
             outfile<<line<<endl;
             continue;        
         }        
+        tokenize(line,locctr,lab,mne,op); 
+        if(mne == "START")
+        {
+            temp.str(op);temp.clear();
+            temp>>hex>>loc;        
+            //write out header record
+            temp.str(symtab.find("END")->second); 
+            temp.clear();       
+            temp>>hex>>len;                            
+            len=len-loc;
+            objfile<<"H"<<left<<setfill(' ')<<setw(6)<<lab<<right<<setfill('0')<<setw(6)<<uppercase<<hex<<loc<<setfill('0')<<setw(6)<<uppercase<<hex<<len<<endl;  
+
+            //initialise first text record
+            textrecord<<"T"<<setfill('0')<<setw(6)<<uppercase<<hex<<loc<<"LN";  
+            continue;        
+        }
+        
+        if(mne == "END")
+        {
+            string trec = textrecord.str();  
+            int len = trec.size()-9;
+            len = len%2==0? len/2 : (len+1)/2;
+            temp.str("");temp.clear();
+            temp<<setw(2)<<setfill('0')<<uppercase<<hex<<len;
+            trec.replace(trec.find("LN"),2,temp.str());            
+            objfile<<trec<<endl;
+            temp.str("");
+            temp.clear();
+            temp<<"E"<<setfill('0')<<setw(6)<<uppercase<<hex<<first<<endl;
+            objfile<<temp.str()<<endl;
+            break;
+        }        
+
         //generate object code for given line
-        objcode = generate(line);    
-        if(objcode == "ERROR"){ cout<<"ERROR at line"<<lineno<<endl;break;}
+        objcode = generate(locctr,lab,mne,op);  
+        if(objcode == "ERROR"){ cout<<"ERROR at line"<<lineno<<endl;break;}        
+        else if(objcode.size()!=0) 
+        {
+            if(textrecord.str().size()+objcode.size()>69||flag==1){
+                string trec = textrecord.str();  
+                int len = (trec.size()-9)/2;
+                temp.str("");temp.clear();
+                temp<<setw(2)<<setfill('0')<<uppercase<<hex<<len;
+                trec.replace(trec.find("LN"),2,temp.str());            
+                objfile<<trec<<endl;
+                //initialise new text record;
+                textrecord.clear();
+                textrecord.str("");            
+                textrecord<<"T"<<setfill('0')<<setw(6)<<uppercase<<hex<<locctr<<"LN";  ;
+                flag = flag==1?0:flag;
+            }
+            textrecord<<objcode;            
+        }
+        else 
+        {
+            flag=1;  
+        }   
+        //pass2a output            
         outfile<<line<<"\t"<<objcode<<"\n";
+        
     }
 
     infile.close();
     outfile.close();
+    objfile.close();
 }
 
-string generate(string line)
+string generate(string loc,string lab,string mne, string op)
 {    
     bool index = false;
-    string loc,lab,mne,op,objcode= "";    
-    stringstream temp;
-    tokenize(line,loc,lab,mne,op);    
-    
-    if(mne == "START" || mne == "END") return "";
+    string objcode= "";    
+    stringstream temp("");    
     
     iter = optab.find(mne);
     
     if(iter->second != "*") //normal instruction - not data
     {
-        objcode = iter->second;
+        if(first==-1){ 
+            stringstream s(loc);
+            s>>hex>>first;
+        }
+        objcode = iter->second;                
         if(op.size()==0) // like rsub
-        {
+        {            
             temp<<objcode<<setfill('0')<<setw(4)<<hex<<0;            
         }
         else
@@ -97,7 +156,7 @@ string generate(string line)
             if(op.find(",X")!=string::npos)   
             {
                 //it contains ,X - so lets get the original symbol
-                op.replace(op.find(",X"),op.length(),"");  
+                op.replace(op.find(",X"),2,"");  
                 if(symtab.find(op)==symtab.end()){
                     return "ERROR";
                 }
